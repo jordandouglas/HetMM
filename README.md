@@ -35,7 +35,10 @@ However, BEAST 2 comes with a wide range of tools that that help with Bayesian i
 
 ```/path/to/beast/bin/beauti```
 
-2. Install the HetMM package. Since HetMM is currently in pre-release, you may need to add an extra package repository as follows:
+
+2. Go to File -> Manage Packages
+
+3. Install the HetMM package. Since HetMM is currently in pre-release, you may need to add an extra package repository as follows:
 
   * click the `packager repositories` button. A dialog pops up.
   * click the `Add URL` button. A dialog is shown where you can enter `https://raw.githubusercontent.com/CompEvol/CBAN/master/packages-extra-2.7.xml`
@@ -44,15 +47,18 @@ However, BEAST 2 comes with a wide range of tools that that help with Bayesian i
   * After a short delay, the HetMM package should appear in the list of packages.
 
 
+4. Close BEAUti
+
+
 ## Using HetMM
 
 In this tutorial we will consider the hydrolysis of sucrose by Michaelis and Menten 1913.
 
-1. Download the example file [here](examples/MM.tsv). 
+1. Download the example file [here](https://raw.githubusercontent.com/jordandouglas/HetMM/main/examples/MM.csv). 
 
-2. Download the XML file template [here](examples/HetHill.xml). This file contains the full Bayesian model configuration, including parameters, prior distributions, and operators. 
+2. Download the XML file template [here](https://raw.githubusercontent.com/jordandouglas/HetMM/main/examples/HetHill.xml). This file contains the full Bayesian model configuration, including parameters, prior distributions, and operators. 
    
-3. Use the [csv2json.R](scripts/csv2json.R) script to convert the csv file into a json file so that it can be read in by BEAST 2:
+3. Use the [csv2json.R](https://raw.githubusercontent.com/jordandouglas/HetMM/main/scripts/csv2json.R) script to convert the csv file into a json file so that it can be read in by BEAST 2:
 
   ```
   Rscript csv2json.R MM.tsv
@@ -77,18 +83,18 @@ Note that the first time you use R, you may need to select a mirror to install p
   ```
 
 
-4. Run BEAST 2 on the XML file using:
+4. Run BEAST 2 on the XML file from the command line using:
   ```/path/to/beast/bin/beast -df MM.json HetHill.xml```
 
 5. Now, BEAST should start running. On the sucrose dataset, it should take around 20 minutes to complete but you can proceed to the next step while you wait.
 
-6. To diagnose the MCMC chain and understand its parameters, open Tracer and open `HetHill.log`. Ensure that the effective sample size (ESS) of all parameters exceeded 200, and if not, the MCMC chain should be run for longer. Please see the tutorial on using Tracer for further details | https://beast.community/analysing_beast_output
+6. To diagnose the MCMC chain and understand its parameters, open Tracer and open `HetHill.log`. Ensure that the effective sample size (ESS) of all parameters exceeded 200, and if not, the MCMC chain should be run for longer. Please see the Tracer tutorial for further details: https://beast.community/analysing_beast_output
 
-7. The probability that the dataset is heterogeneous is the `mean' value of the parameter called `ModelIndicator`. 0 is homogeneous, 1 is heterogeneous.
+7. The probability that the dataset is heterogeneous is the mean value of the parameter called `ModelIndicator`. 0 is homogeneous, 1 is heterogeneous.
 
-8. The distribution of Hill coefficient directions is under the parameter `HillIndicator'. -1 is negative cooperativity (h<1), 0 is neutral (h=1), and +1 is positive cooperativity (h>1). 
+8. The distribution of Hill coefficient directions is under the parameter `HillIndicator`. -1 is negative cooperativity (h<1), 0 is neutral (h=1), and +1 is positive cooperativity (h>1). 
 
-9. To visualise the model summarise the posterior distribution, use the R script here. From the command line this can be done using:
+9. To visualise the model and summarise the posterior distribution, use the [plotMM.R](https://raw.githubusercontent.com/jordandouglas/HetMM/main/scripts/plotMM.R) script. From the command line this can be done using:
 
    ```Rscript plotMM.R HetHill.log```
 
@@ -98,7 +104,7 @@ Note that the first time you use R, you may need to select a mirror to install p
    ![Heterogeneous Michaelis-Menten plot](figures/MM.png)
 
 
-   ```
+  ```
    Summarising posterior distribution:
    median (2.5 percentile, 97.5 percentile)
         Vmax = 3.94 (3.6, 9.99) 
@@ -111,15 +117,12 @@ Note that the first time you use R, you may need to select a mirror to install p
 
 
 
-
-
-
 ## Preparing your own data file
 
 First, prepare a .csv (comma separated variable) file with two columns. The first should contain substrate concentrations, and the second with reaction velocities. Columns should be separated by commas. 
 
 
-Then, use the [csv2json.R](scripts/csv2json.R) script to convert the csv file into a json file
+Then, use the [csv2json.R](https://raw.githubusercontent.com/jordandouglas/HetMM/main/scripts/csv2json.R) script to convert the csv file into a json file
 
   ```
   Rscript csv2json.R DATA.tsv
@@ -135,6 +138,9 @@ Open the XML file in a text editor, find the following line, and edit the value 
 
 ```<run id="mcmc" spec="MCMC" chainLength="10000000">```
 
+
+
+## Parameters
 
 
 ## Prior distributions
