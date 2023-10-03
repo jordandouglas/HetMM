@@ -1,0 +1,24 @@
+<package name='hetMM' version='0.0.1'>
+	<depends on='BEAST.base' atleast='2.7.5'/>
+	<depends on='BEAST.app' atleast='2.7.5'/>
+
+	
+
+    <service type="beast.base.core.BEASTInterface">
+
+         <provider classname="hetmm.BimodalLogNormal"/>
+         <provider classname="hetmm.KineticData"/>
+         <provider classname="hetmm.KineticDataPoint"/>
+         <provider classname="hetmm.HomogeneousLikelihood"/>
+         <provider classname="hetmm.HeterogeneousLikelihood"/>
+         <provider classname="hetmm.HKLikelihood"/>
+         <provider classname="hetmm.KineticDataSimulator"/>
+         <provider classname="hetmm.CovarianceBetaPrior"/>
+         <provider classname="hetmm.BinomialPrior"/>
+
+
+    </service>
+
+
+
+</package>
