@@ -12,6 +12,7 @@ import beast.base.core.Input;
 import beast.base.inference.Distribution;
 import beast.base.inference.State;
 import beast.base.inference.parameter.BooleanParameter;
+import beast.base.inference.parameter.IntegerParameter;
 import beast.base.inference.parameter.RealParameter;
 import beast.base.util.Randomizer;
 
@@ -28,8 +29,7 @@ public class HomogeneousLikelihood extends Distribution {
 	// Hill coefficient?
 	final public Input<RealParameter> hillLInput = new Input<>("hillLower", "hill lower coefficient", Input.Validate.OPTIONAL);
 	final public Input<RealParameter> hillUInput = new Input<>("hillUpper", "hill upper coefficient", Input.Validate.OPTIONAL);
-	final public Input<BooleanParameter> hillIndicatorInput = new Input<>("hillIndicator", "hill coefficient indicator", Input.Validate.OPTIONAL);
-	final public Input<BooleanParameter> hillDirectionIndicatorInput = new Input<>("hillDirection", "hill direction (if hillIndicator=1). this is 1 when using hillL, and 0 when using hillU", Input.Validate.OPTIONAL);
+	final public Input<IntegerParameter> hillIndicatorInput = new Input<>("hillIndicator", "hill coefficient indicator. 0 is h=1, -1 is h<1, +1 is h>1", Input.Validate.OPTIONAL);
 	
 	final public Input<Boolean> logInput = new Input<>("log", "perform regression in log space?", true);
 	
@@ -40,10 +40,13 @@ public class HomogeneousLikelihood extends Distribution {
 		
 		if (hillIndicatorInput.get() != null) {
 			
-			if (hillLInput.get() == null || hillUInput.get() == null || hillDirectionIndicatorInput.get() == null) {
-				throw new IllegalArgumentException("Please provide all 4 hill inputs, or none at all. hillL, hillU, hillIndicator, and hillDirection");
+			if (hillLInput.get() == null || hillUInput.get() == null) {
+				throw new IllegalArgumentException("Please provide all 3 hill inputs, or none at all. hillL, hillU, and hillIndicator");
 			}
 			
+			
+			hillIndicatorInput.get().setLower(-1);
+			hillIndicatorInput.get().setUpper(+1);
 			
 		}
 		
@@ -135,13 +138,18 @@ public class HomogeneousLikelihood extends Distribution {
 	 * @return
 	 */
 	public double getHill() {
+		
 		if (hillIndicatorInput.get() == null) return 1;
-		if (!hillIndicatorInput.get().getValue()) return 1;
-		if (hillDirectionIndicatorInput.get().getValue()) {
+		
+		if (hillIndicatorInput.get().getValue() == -1) {
 			return hillLInput.get().getValue();
-		}else {
+		}
+		
+		if (hillIndicatorInput.get().getValue() == 1) {
 			return hillUInput.get().getValue();
 		}
+		
+		return 1;
 	}
 	
 	

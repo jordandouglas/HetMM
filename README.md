@@ -21,11 +21,12 @@ However, BEAST 2 comes with a wide range of tools that that help with Bayesian i
 
 ### Required
 - BEAST 2 is required to run HetMM | https://www.beast2.org/
+- R will be used for preparing the data and generating figures | https://www.r-project.org/
 
 
 ### Recommended
 - Tracer is useful for analysing MCMC chains | https://www.beast2.org/tracer-2/
-- R will be used for generating figures | https://www.r-project.org/
+
 
 
 ## Installing HetMM
@@ -47,28 +48,17 @@ However, BEAST 2 comes with a wide range of tools that that help with Bayesian i
 
 In this tutorial we will consider the hydrolysis of sucrose by Michaelis and Menten 1913.
 
-1. Download the example file here. Alternatively, prepare your own .csv (comma separated variable) file with two columns. The first should contain substrate concentrations, and the second with reaction velocities. Columns should be separated by commas. If you wish to use your own dataset, you may first want to adjust the prior distributions, as described further down this page.
+1. Download the example file [here](examples/MM.tsv). 
+
+2. Download the XML file template [here](examples/HetHill.xml). This file contains the full Bayesian model configuration, including parameters, prior distributions, and operators. 
    
-2. Download the XML file template here. This file contains the full Bayesian model configuration, including parameters, prior distributions, and operators. Additional files can be found in the `models' folder
+3. Use the [csv2json.R](scripts/csv2json.R) script to convert the csv file into a json file so that it can be read in by BEAST 2:
 
-3. Open the XML file in a text editor. At the top of the file you will see `file="FILE.csv"`. Replace `FILE.csv` with `MM.csv`, or whatever your own csv file is called.
+  ```
+  Rscript csv2json.R MM.tsv
+  ```
 
-4. Run BEAST 2 on the XML file using:
-```/path/to/beast/bin/beast HetHillMM.xml```
-
-5. Now, BEAST should start running. On the sucrose dataset, it should take around 5-10 minutes to complete.
-
-6. To diagnose the MCMC chain and understand its parameters, open Tracer and open `HetHill.log`. Ensure that the effective sample size (ESS) of all parameters exceeded 200, and if not, the MCMC chain should be run for longer. Please see the tutorial on using Tracer for further details | https://beast.community/analysing_beast_output
-
-7. The probability that the dataset is heterogeneous is the `mean' value of the parameter called `ModelIndicator`. 0 is homogeneous, 1 is heterogeneous.
-
-8. The distribution of Hill coefficient directions is under the parameter `HillIndicator'. -1 is negative cooperativity (h<1), 0 is neutral (h=1), and +1 is positive cooperativity (h>1). 
-
-9. To visualise the model and posterior distribution, use the R script here. From the command line this can be done using:
-
-   ```Rscript plotMM.R HetHill.log```
-
-   A file named HetHill.png should have been generated. This image will contain 1 line per sample from the MCMC chain, coloured yellow for homogeneous and blue for heterogeneous. If all of the lines are blue
+This will generate a file called `MM.json`.
 
 Note that the first time you use R, you may need to select a mirror to install packages from. This can be done by:
 
@@ -76,21 +66,75 @@ Note that the first time you use R, you may need to select a mirror to install p
   # Open R
   R
 
-  # Install a package, then follow the instructions to select a mirror
-  install.packages("HDInterval")
+  # Request to install a package, then follow the instructions to select a mirror
+  install.packages("jsonlite")
 
   # Confirm the package was successfully installed
-  library(HDInterval)
+  library(jsonlite)
 
   # Quit R
   q() 
   ```
 
 
+4. Run BEAST 2 on the XML file using:
+  ```/path/to/beast/bin/beast -df MM.json HetHill.xml```
 
+5. Now, BEAST should start running. On the sucrose dataset, it should take around 20 minutes to complete but you can proceed to the next step while you wait.
+
+6. To diagnose the MCMC chain and understand its parameters, open Tracer and open `HetHill.log`. Ensure that the effective sample size (ESS) of all parameters exceeded 200, and if not, the MCMC chain should be run for longer. Please see the tutorial on using Tracer for further details | https://beast.community/analysing_beast_output
+
+7. The probability that the dataset is heterogeneous is the `mean' value of the parameter called `ModelIndicator`. 0 is homogeneous, 1 is heterogeneous.
+
+8. The distribution of Hill coefficient directions is under the parameter `HillIndicator'. -1 is negative cooperativity (h<1), 0 is neutral (h=1), and +1 is positive cooperativity (h>1). 
+
+9. To visualise the model summarise the posterior distribution, use the R script here. From the command line this can be done using:
+
+   ```Rscript plotMM.R HetHill.log```
+
+   A file named HetHill.log.png should have been generated. This image will contain 1 line per sample from the MCMC chain, coloured yellow for homogeneous and blue for heterogeneous. In this case, there are a mixture of blue and yellow lines. A larger dataset typically has just 1 colour, representing higher confidence in the correct model. A summary of the inferred model parameters is also printed.
+
+
+   ![Heterogeneous Michaelis-Menten plot](figures/MM.png)
+
+
+   ```
+   Summarising posterior distribution:
+   median (2.5 percentile, 97.5 percentile)
+        Vmax = 3.94 (3.6, 9.99) 
+          Km = 0.0207 (0.0148, 1.63) 
+           ε = 0.0419 (0.0144, 0.211) 
+   p(hetero) = 0.468 
+     p(Hill) = 0.305 
+  Best model = Homogeneous 
+  ```
+
+
+
+
+
+
+## Preparing your own data file
+
+First, prepare a .csv (comma separated variable) file with two columns. The first should contain substrate concentrations, and the second with reaction velocities. Columns should be separated by commas. 
+
+
+Then, use the [csv2json.R](scripts/csv2json.R) script to convert the csv file into a json file
+
+  ```
+  Rscript csv2json.R DATA.tsv
+  ```
+
+Lastly, run BEAST 2 on the newly generated `DATA.json` file
+  ```/path/to/beast/bin/beast -df DATA.json HetHill.xml```
 
 
 ## Increasing the MCMC chain length
+
+Open the XML file in a text editor, find the following line, and edit the value of `chainLength` accordingly.
+
+```<run id="mcmc" spec="MCMC" chainLength="10000000">```
+
 
 
 ## Prior distributions
