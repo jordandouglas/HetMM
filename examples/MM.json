@@ -1,0 +1,4 @@
+{
+  "data": "<observation spec=\"hetmm.KineticDataPoint\" reactant=\"X\" a=\"0.0052\" v=\"0.866\" />\n<observation spec=\"hetmm.KineticDataPoint\" reactant=\"X\" a=\"0.0104\" v=\"1.466\" />\n<observation spec=\"hetmm.KineticDataPoint\" reactant=\"X\" a=\"0.0208\" v=\"2.114\" />\n<observation spec=\"hetmm.KineticDataPoint\" reactant=\"X\" a=\"0.0416\" v=\"2.666\" />\n<observation spec=\"hetmm.KineticDataPoint\" reactant=\"X\" a=\"0.0833\" v=\"3.236\" />\n<observation spec=\"hetmm.KineticDataPoint\" reactant=\"X\" a=\"0.167\" v=\"3.636\" />\n<observation spec=\"hetmm.KineticDataPoint\" reactant=\"X\" a=\"0.333\" v=\"3.636\" />",
+  "name": "MM.csv"
+}

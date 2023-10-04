@@ -15,7 +15,8 @@
          <provider classname="hetmm.KineticDataSimulator"/>
          <provider classname="hetmm.CovarianceBetaPrior"/>
          <provider classname="hetmm.BinomialPrior"/>
-
+         <provider classname="hetmm.MultinomialPrior"/>
+         <provider classname="hetmm.Inversion"/>
 
     </service>
 

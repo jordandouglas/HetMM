@@ -1,0 +1,21 @@
+<itsabeastystatewerein version='2.0' sample='49999'>
+<statenode id='vmax'>vmax[1 1] (0.0,Infinity): 119.40945728450997 </statenode>
+<statenode id='km'>km[1 1] (0.0,Infinity): 35.647399503958106 </statenode>
+<statenode id='kmSD'>kmSD[1 1] (0.0,Infinity): 3.179343244472462 </statenode>
+<statenode id='hill0'>hill0[1 1] (0.0,1.0): 0.6337736730797149 </statenode>
+<statenode id='errorSD'>errorSD[1 1] (0.0,Infinity): 0.1601236904547118 </statenode>
+<statenode id='modelIndicator'>modelIndicator[1 1] (null,true): false </statenode>
+<statenode id='hillIndicator'>hillIndicator[1 1] (-1,1): 1 </statenode>
+</itsabeastystatewerein>
+<!--
+{"operators":[
+{"id":"errorSD.scale","p":0.22339962313717962,"accept":2318,"reject":3472,"acceptFC":1516,"rejectFC":2996,"rejectIv":0,"rejectOp":0},
+{"id":"vmax.scale","p":0.05537783408677892,"accept":1443,"reject":4489,"acceptFC":1301,"rejectFC":3283,"rejectIv":0,"rejectOp":0},
+{"id":"km.scale","p":0.06397895922827898,"accept":1507,"reject":4398,"acceptFC":1345,"rejectFC":3287,"rejectIv":0,"rejectOp":0},
+{"id":"kmSD.scale","p":1.0222722981974846,"accept":2972,"reject":2757,"acceptFC":1756,"rejectFC":2631,"rejectIv":0,"rejectOp":0},
+{"id":"hill.scale","p":0.04402513987090013,"accept":1137,"reject":4780,"acceptFC":1071,"rejectFC":3480,"rejectIv":0,"rejectOp":0},
+{"id":"indicatorBitFlip","p":"NaN","accept":6,"reject":2903,"acceptFC":0,"rejectFC":2250,"rejectIv":0,"rejectOp":0},
+{"id":"hillIndicatorRandomWalk","p":"NaN","accept":1,"reject":2917,"acceptFC":0,"rejectFC":2265,"rejectIv":1893,"rejectOp":1893},
+{"id":"AdaptableVarianceMultivariateNormalOperator","p":0.3957298815403707,"means":"[4.771030079191477, 3.574821630254799, 1.037164960016499, -1.7851159156706067, 0.4546643826718461]","covariance":"[0.003596963008173421, 0.0037552491377928904, 6.554374249165097E-4, -4.8434964857197295E-4, 0.001756923323403194, 0.005603804796391644, 5.155468681302706E-4, -2.789274753865293E-4, 0.0037622136165773854, 0.2565808882333187, -0.001647174211801227, -2.4879639652663544E-4, 0.010862085200128697, 1.5535747653303334E-4, 0.005107290455333475]","accept":2806,"reject":12094,"acceptFC":2775,"rejectFC":8730,"rejectIv":0,"rejectOp":0}
+]}
+-->

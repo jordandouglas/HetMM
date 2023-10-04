@@ -27,8 +27,7 @@ public class HomogeneousLikelihood extends Distribution {
 	
 	
 	// Hill coefficient?
-	final public Input<RealParameter> hillLInput = new Input<>("hillLower", "hill lower coefficient", Input.Validate.OPTIONAL);
-	final public Input<RealParameter> hillUInput = new Input<>("hillUpper", "hill upper coefficient", Input.Validate.OPTIONAL);
+	final public Input<RealParameter> hillInput = new Input<>("hill", "hill lower coefficient", Input.Validate.OPTIONAL);
 	final public Input<IntegerParameter> hillIndicatorInput = new Input<>("hillIndicator", "hill coefficient indicator. 0 is h=1, -1 is h<1, +1 is h>1", Input.Validate.OPTIONAL);
 	
 	final public Input<Boolean> logInput = new Input<>("log", "perform regression in log space?", true);
@@ -40,8 +39,8 @@ public class HomogeneousLikelihood extends Distribution {
 		
 		if (hillIndicatorInput.get() != null) {
 			
-			if (hillLInput.get() == null || hillUInput.get() == null) {
-				throw new IllegalArgumentException("Please provide all 3 hill inputs, or none at all. hillL, hillU, and hillIndicator");
+			if (hillInput.get() == null) {
+				throw new IllegalArgumentException("Please provide both hill inputs, or none at all. hillL and hillIndicator");
 			}
 			
 			
@@ -141,12 +140,15 @@ public class HomogeneousLikelihood extends Distribution {
 		
 		if (hillIndicatorInput.get() == null) return 1;
 		
+		
+		// Regular
 		if (hillIndicatorInput.get().getValue() == -1) {
-			return hillLInput.get().getValue();
+			return hillInput.get().getValue();
 		}
 		
+		// Inversion
 		if (hillIndicatorInput.get().getValue() == 1) {
-			return hillUInput.get().getValue();
+			return 1.0 / hillInput.get().getValue();
 		}
 		
 		return 1;

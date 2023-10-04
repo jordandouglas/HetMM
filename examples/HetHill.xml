@@ -14,27 +14,27 @@
 
 
     <data id="data" spec="hetmm.KineticData" >
-        $(data)
+            $(data)
     </data>
         
 
+
+    
 
     <run id="mcmc" spec="MCMC" chainLength="10000000">
             
         <state id="state" spec="State" storeEvery="5000">
                     
           
-        <parameter id="vmax" spec="parameter.RealParameter" lower="0.0" name="stateNode">10.0</parameter>
-        <parameter id="km" spec="parameter.RealParameter" lower="0.0" name="stateNode">10.0</parameter>        
-        <parameter id="kmSD" spec="parameter.RealParameter" lower="0.0" name="stateNode">2.0</parameter>
-        <parameter id="hillLower" spec="parameter.RealParameter" lower="0" upper="1" name="stateNode">0.5</parameter>
-        <parameter id="hillUpper" spec="parameter.RealParameter" lower="1" name="stateNode">2</parameter>
+            <parameter id="vmax" spec="parameter.RealParameter" lower="0.0" name="stateNode">1.0</parameter>
+            <parameter id="km" spec="parameter.RealParameter" lower="0.0" name="stateNode">1.0</parameter>        
+            <parameter id="kmSD" spec="parameter.RealParameter" lower="0.0" name="stateNode">1.0</parameter>
+            <parameter id="hill0" spec="parameter.RealParameter" lower="0" upper="1" name="stateNode">0.9</parameter>
 
-        <parameter id="errorSD" spec="parameter.RealParameter" lower="0.0" name="stateNode">0.1</parameter>
+            <parameter id="errorSD" spec="parameter.RealParameter" lower="0.0" name="stateNode">0.1</parameter>
 
-        <parameter id="modelIndicator" spec="parameter.BooleanParameter" name="stateNode">true</parameter>
-        <parameter id="hillIndicator" spec="parameter.BooleanParameter" name="stateNode">false</parameter>
-        <parameter id="hillDirectionIndicator" spec="parameter.BooleanParameter" name="stateNode">true</parameter>
+            <parameter id="modelIndicator" spec="parameter.BooleanParameter" name="stateNode">false</parameter>
+            <parameter id="hillIndicator" spec="parameter.IntegerParameter" lower="-1" upper="1" name="stateNode">0</parameter>
                 
         </state>
             
@@ -43,16 +43,11 @@
         <distribution id="posterior" spec="CompoundDistribution">
            <distribution id="prior" spec="CompoundDistribution">
 
-
-                <prior id="hillLower.prior" name="distribution" x="@hillLower">
+                <prior id="hill.prior" name="distribution" x="@hill0">
                     <Beta alpha="2" beta="4" name="distr" />
                 </prior>
 
-                <prior id="hillUpper.prior" name="distribution" x="@hillUpper">
-                    <Gamma alpha="3" beta="1" offset="1" name="distr" />
-                </prior>
-
-
+              
                 <prior id="vmax.prior" name="distribution" x="@vmax">
                     <LogNormal M="1" S="2" meanInRealSpace="false" name="distr" />
                 </prior> 
@@ -68,16 +63,14 @@
                     <LogNormal M="1" S="0.5" meanInRealSpace="false" name="distr" />
                 </prior>
 
-                <distribution spec="hetmm.BinomialPrior" id="indicator.prior" x="@modelIndicator" p="0.5" />
-                <distribution spec="hetmm.BinomialPrior" id="hillindicator.prior" x="@hillIndicator" p="0.5" />
-                <distribution spec="hetmm.BinomialPrior" id="hillDirectionIndicator.prior" x="@hillDirectionIndicator" p="0.5" />
-                 
+                <distribution spec="hetmm.MultinomialPrior" id="hillindicator.prior" x="@hillIndicator">
+                    <p spec="parameter.RealParameter" lower="0" upper="1">0.25 0.5 0.25</p>
+                </distribution>
                 
 
-                 <prior id="sd.prior" name="distribution" x="@errorSD">
+                <prior id="sd.prior" name="distribution" x="@errorSD">
                     <LogNormal M="-1.5" S="1" meanInRealSpace="false" name="distr" />
                 </prior>
-
 
                         
             </distribution>
@@ -85,7 +78,7 @@
                     
             <distribution id="likelihood" spec="CompoundDistribution" useThreads="true">
 
-                <distribution id="HKLikelihood" spec="hetmm.HKLikelihood" data="@data" hillLower="@hillLower" hillUpper="@hillUpper" hillIndicator="@hillIndicator" hillDirection="@hillDirectionIndicator" indicator="@modelIndicator" vmax="@vmax" km="@km" sd="@errorSD"  kmSD="@kmSD" nsteps="1000"  />
+                <distribution id="HKLikelihood" spec="hetmm.HKLikelihood" data="@data" hill="@hill0" hillIndicator="@hillIndicator" indicator="@modelIndicator" vmax="@vmax" km="@km" sd="@errorSD"  kmSD="@kmSD" nsteps="1000"  />
 
 
 
@@ -100,8 +93,7 @@
         <operator id="vmax.scale" spec="kernel.BactrianScaleOperator" parameter="@vmax" scaleFactor="0.1" weight="2.0"/> 
         <operator id="km.scale" spec="kernel.BactrianScaleOperator" parameter="@km" scaleFactor="0.1" weight="2.0"/>
         <operator id="kmSD.scale" spec="kernel.BactrianScaleOperator" parameter="@kmSD" scaleFactor="0.1" weight="2.0"/>
-        <operator id="hillUpper.scale" spec="kernel.BactrianScaleOperator" parameter="@hillUpper" scaleFactor="0.1" weight="2.0"/>
-        <operator id="hillLower.scale" spec="kernel.BactrianScaleOperator" parameter="@hillLower" scaleFactor="0.1" weight="2.0"/>
+        <operator id="hill.scale" spec="kernel.BactrianScaleOperator" parameter="@hill0" scaleFactor="0.1" weight="2.0"/>
 
 
         
@@ -109,8 +101,7 @@
 
 
         <operator id="indicatorBitFlip" spec="BitFlipOperator" parameter="@modelIndicator" weight="1.0"/>
-        <operator id="hillIndicatorBitFlip" spec="BitFlipOperator" parameter="@hillIndicator" weight="1.0"/>
-        <operator id="hillDirectionIndicatorBitFlip" spec="BitFlipOperator" parameter="@hillDirectionIndicator" weight="1.0"/>
+        <operator id="hillIndicatorRandomWalk" spec="IntRandomWalkOperator" windowSize="1" parameter="@hillIndicator" weight="1.0"/>
 
         
 
@@ -132,7 +123,7 @@
             </transformations>
 
             <transformations spec="beast.base.inference.operator.kernel.Transform$LogitTransform">
-                <f idref="hillLower"/>
+                <f idref="hill0"/>
             </transformations>
 
 
@@ -143,7 +134,7 @@
             
      
             
-        <logger id="tracelog" spec="Logger" fileName="$(filebase).log" logEvery="40000" model="@posterior" sanitiseHeaders="true" sort="smart">
+        <logger id="tracelog" spec="Logger" fileName="$(filebase).log" logEvery="10000" model="@posterior" sanitiseHeaders="true" sort="smart">
                     
 
 
@@ -154,14 +145,12 @@
             
             <log idref="vmax" />
             <log idref="km" />
-            <log idref="hillLower" />
-            <log idref="hillUpper" />
+            <log idref="hill0" />
 
 
             <log idref="kmSD" />
             <log idref="modelIndicator" />
             <log idref="hillIndicator" />
-            <log idref="hillDirectionIndicator" />
 
             <log idref="errorSD" />
 
@@ -172,17 +161,14 @@
         </logger>
             
         <logger id="screenlog" spec="Logger" logEvery="10000">
-             <log idref="likelihood"/>
-
             <log idref="vmax" />
             <log idref="km" />
-            <log idref="errorSD" />
+            <log idref="hill0" />
+
             <log idref="kmSD" />
-            
 
             <log idref="modelIndicator" />
             <log idref="hillIndicator" />
-            <log idref="hillDirectionIndicator" />
         </logger>
           
     

@@ -88,7 +88,7 @@ Note that the first time you use R, you may need to select a mirror to install p
 
 5. Now, BEAST should start running. On the sucrose dataset, it should take around 20 minutes to complete but you can proceed to the next step while you wait.
 
-6. To diagnose the MCMC chain and understand its parameters, open Tracer and open `HetHill.log`. Ensure that the effective sample size (ESS) of all parameters exceeded 200, and if not, the MCMC chain should be run for longer. Please see the Tracer tutorial for further details: https://beast.community/analysing_beast_output
+6. To diagnose the MCMC chain and understand its parameters, open Tracer and open `HetHill.log`. Ensure that the effective sample size (ESS) of all parameters exceeds 200, and if not, the MCMC chain should be run for longer. Please see the Tracer tutorial for further details: https://beast.community/analysing_beast_output
 
 7. The probability that the dataset is heterogeneous is the mean value of the parameter called `ModelIndicator`. 0 is homogeneous, 1 is heterogeneous.
 
@@ -98,28 +98,28 @@ Note that the first time you use R, you may need to select a mirror to install p
 
    ```Rscript plotMM.R HetHill.log```
 
-   A file named HetHill.log.png should have been generated. This image will contain 1 line per sample from the MCMC chain, coloured yellow for homogeneous and blue for heterogeneous. In this case, there are a mixture of blue and yellow lines. A larger dataset typically has just 1 colour, representing higher confidence in the correct model. A summary of the inferred model parameters is also printed.
+   A file named HetHill.log.png should have been generated. This image will contain 1 line per sample from the MCMC chain, coloured yellow for homogeneous and blue for heterogeneous. In this case, there are a mixture of blue and yellow lines. A larger dataset typically has just 1 colour, reflecting a higher level of confidence in the correct model. A summary of the inferred model parameters is also printed.
 
 
    ![Heterogeneous Michaelis-Menten plot](figures/MM.png)
 
 
   ```
-   Summarising posterior distribution:
-   median (2.5 percentile, 97.5 percentile)
-        Vmax = 3.94 (3.6, 9.99) 
-          Km = 0.0207 (0.0148, 1.63) 
-           ε = 0.0419 (0.0144, 0.211) 
-   p(hetero) = 0.468 
-     p(Hill) = 0.305 
-  Best model = Homogeneous 
+  Summarising posterior distribution:
+  median (2.5 percentile, 97.5 percentile)
+          Vmax = 3.92 (3.6, 4.26) 
+            Km = 0.0182 (0.0144, 0.0414) 
+             ε = 0.033 (0.0125, 0.0884) 
+     p(hetero) = 0.102 
+       p(Hill) = 0.0574 
+    Best model = Homogeneous 
   ```
 
 
 
-## Preparing your own data file
+## Preparing a data file
 
-First, prepare a .csv (comma separated variable) file with two columns. The first should contain substrate concentrations, and the second with reaction velocities. Columns should be separated by commas. 
+First, prepare a .csv (comma separated variable) file with two columns. The first column should contain substrate concentrations, and the second with reaction velocities. Columns should be separated by commas. 
 
 
 Then, use the [csv2json.R](https://raw.githubusercontent.com/jordandouglas/HetMM/main/scripts/csv2json.R) script to convert the csv file into a json file
@@ -140,13 +140,118 @@ Open the XML file in a text editor, find the following line, and edit the value 
 
 
 
-## Parameters
-
-
-## Prior distributions
-
 
 ## Model averaging
+
+The following model indicators
+
+1. `ModelIndicator` is 0 when the homogeneous model is being used, and 1 for heterogeneous
+2. `HillIndicator` is -1 when the Hill coefficient is <1, 1 when Hill is 1, and +1 when Hill is greater than 1
+
+These two indicators are estimated during MCMC. They can also be fixed.  
+
+
+In order to impose symmetry on the Hill coefficient, the `hill0` parameter is given a Beta distribution
+
+
+```
+<prior id="hill.prior" name="distribution" x="@hill0">
+    <Beta alpha="2" beta="4" name="distr" />
+</prior>
+```
+
+When `HillIndicator=-1`, the coefficient is `hill0`. When `HillIndicator=1`, the Hill coefficient is set to 1. And, when `HillIndicator=1`, the Hill coefficient is set to the reciprocal of `hill0`.
+The Beta prior above places most of the probability mass away from h=1, so that the three models can be distinguished. 
+
+
+
+## Parameters
+
+This model contains the following parameters:
+
+1. Vmax - the maximum reaction rate
+2. Km - the substrate concentration that gives half of Vmax
+3. errorSD ε - the standard deviation of error, in log-space. Error between expected and observed velocities are assumed to follow a log-normal(0, ε) distribution
+4. kmSD - the standard deviation of Km across enzymes in the mixture. This parameter is only used in the heterogeneous model
+5. Hill - the Hill coefficient. This parameter is only used in the Hill model
+
+
+
+
+## Changing prior distributions
+
+
+Edit the XML file to change the prior distributions. For example, the default prior for vmax is a log-normal(mu=1, sigma=2) distribution. 
+
+```
+<prior id="vmax.prior" name="distribution" x="@vmax">
+    <LogNormal M="1" S="2" meanInRealSpace="false" name="distr" />
+</prior> 
+```
+
+if you wanted to change this to a Gamma(alpha=2, beta=2) distribution, change it to:
+
+```
+<prior id="vmax.prior" name="distribution" x="@vmax">
+    <Gamma alpha="2" beta="2" name="distr" />
+</prior> 
+```
+
+or for an  Exponential(mean=1000) distribution, change it to:
+
+```
+<prior id="vmax.prior" name="distribution" x="@vmax">
+    <Exponential mean="1000" name="distr" />
+</prior> 
+```
+
+The priors should reflect one's expectation about the parameters prior to observing the data. Adjusting the prior distributions from the default is especially important for Km and Vmax, as these are sensitive to the units. If Km is expressed in mM or M , their values will be 1000 times different. 
+
+
+
+## Sampling from the prior
+
+To sample from the prior distribution (and ignore the data), use the following command:
+
+  ```/path/to/beast/bin/beast -sampleFromPrior -df DATA.json HetHill.xml```
+
+
+## Fixing a parameter or model indicator
+
+
+Any parameter or model indicator is easily fixed, by editing the XML file. First, find the parameter in the state and set its value to the desired value.
+For example, to set the initial Vmax, edit the `1.0` below:
+
+
+```
+<parameter id="vmax" spec="parameter.RealParameter" lower="0.0" name="stateNode">1.0</parameter>
+```
+
+or to use the heterogeneous model, set the false to a true below:
+
+```
+<parameter id="modelIndicator" spec="parameter.BooleanParameter" name="stateNode">false</parameter>
+```
+
+
+Then, to ensure the value does not change during MCMC, delete all operators that change the value.
+For example, to fix Vmax, delete the following two lines (or comment then out using <!-- comment -->) 
+
+```
+<operator id="vmax.scale" spec="kernel.BactrianScaleOperator" parameter="@vmax" scaleFactor="0.1" weight="2.0"/> 
+```
+and
+```
+<f idref="vmax"/>
+```
+
+
+or, to fix the model indicator, delete the following operator
+
+
+```
+<operator id="indicatorBitFlip" spec="BitFlipOperator" parameter="@modelIndicator" weight="1.0"/>
+```
 
 
 ## Contact
@@ -155,4 +260,5 @@ For any queries, please contact jordan.douglas@auckland.ac.nz, leave an issue on
 
 
 ## References
+
 
