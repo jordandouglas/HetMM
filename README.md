@@ -261,4 +261,5 @@ For any queries, please contact jordan.douglas@auckland.ac.nz, leave an issue on
 
 ## References
 
+Douglas, Jordan, Charles W. Carter Jr, and Peter R. Wills. "HetMM: A Michaelis-Menten model for non-homogeneous enzyme mixtures." bioRxiv (2023): 2023-10.
 
