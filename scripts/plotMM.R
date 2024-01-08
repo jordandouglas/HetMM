@@ -1,11 +1,5 @@
 if (!require(HDInterval, quietly = T)) install.packages("HDInterval")
 library(HDInterval)
-if (!require(graphics, quietly = T)) install.packages("graphics")
-library(graphics)
-if (!require(shape, quietly = T)) install.packages("shape")
-library(shape)
-if (!require(emdbook, quietly = T)) install.packages("emdbook")
-library(emdbook)
 
 
 HILL = FALSE
@@ -133,9 +127,9 @@ if (LOGX){
 
 # Plot
 if (LOGX){
-	plot(1,1, log="x", type="n", xlim = c(xmin, xmax), ylim = c(0, ymax), xlab = "a (log space)", ylab = "r", main = "HetMM", axes=F, xaxs="i", yaxs="i")
+	plot(1,1, log="x", type="n", xlim = c(xmin, xmax), ylim = c(0, ymax), xlab = "a (log scale)", ylab = "r", main = "HetMM", axes=F, xaxs="i", yaxs="i")
 }else{
-	plot(0,0, type="n", xlim = c(xmin, xmax), ylim = c(0, ymax), xlab = "a (log space)", ylab = "r", main = "HetMM", axes=F, xaxs="i", yaxs="i")
+	plot(0,0, type="n", xlim = c(xmin, xmax), ylim = c(0, ymax), xlab = "a", ylab = "r", main = "HetMM", axes=F, xaxs="i", yaxs="i")
 }
 
 
