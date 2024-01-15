@@ -38,7 +38,7 @@ HETERO.LINE.COL = "#1E88E5"
 LINE.COL = "#FFC107"
 
 DASHED.LINE.COL = "#696969"
-LOGX = T
+LOGX = TRUE
 
 # Read in log file
 args = commandArgs(trailingOnly=TRUE)
@@ -124,18 +124,21 @@ xmax = max(a)
 ymax = max(bpred)*1.2
 
 
-xmax = max(a) * 1.5
+
 xmin = 0
 if (LOGX){
-	xmin = min(a)/2
+	xmin = min(a[a!=0])/2
+	xmax = max(a) * 10
+}else{
+	xmax = max(a) * 1.5
 }
 
 
 # Plot
 if (LOGX){
-	plot(1,1, log="x", type="n", xlim = c(xmin, xmax), ylim = c(0, ymax), xlab = "a (log space)", ylab = "r", main = "HetMM", axes=F, xaxs="i", yaxs="i")
+	plot(1,1, log="x", type="n", xlim = c(xmin, xmax), ylim = c(0, ymax), xlab = "a (log scale)", ylab = "r", main = args[1], axes=F, xaxs="i", yaxs="i")
 }else{
-	plot(0,0, type="n", xlim = c(xmin, xmax), ylim = c(0, ymax), xlab = "a (log space)", ylab = "r", main = "HetMM", axes=F, xaxs="i", yaxs="i")
+	plot(0,0, type="n", xlim = c(xmin, xmax), ylim = c(0, ymax), xlab = "a", ylab = "r", main = args[1], axes=F, xaxs="i", yaxs="i")
 }
 
 
@@ -191,18 +194,17 @@ dev.off()
 # Print parameters
 vmax = log.df[,"vmax"]
 errorSD = log.df[,"errorSD"]
-km = log.df[,"km"]
+if (any(colnames(log.df) == "km")) {
+	km = log.df[,"km"]
+}else{
+	km = log.df[,"kmCalc"]
+}
+vmaxOverKm = vmax / km
 kmSD = log.df[,"kmSD"]
 hill = log.df[,"hill"]
 phetero = signif(mean(log.df[,"modelIndicator"]), SF)
-phill = signif(mean(log.df[,"hillIndicator"]), SF)
+phill = signif(sum(log.df[,"hillIndicator"] != 0) / nrow(log.df), SF)
 
-if (phetero > 0.95 | phetero < 0.05){
-	phetero = paste0("\\textbf{", phetero, "}")
-}
-if (phill > 0.95 | phill < 0.05){
-	phill = paste0("\\textbf{", phill, "}")
-}
 
 
 if (modelIndicator == "Homogeneous"){
@@ -223,12 +225,12 @@ cat(paste("Summarising posterior distribution:\n"))
 cat(paste("median (2.5 percentile, 97.5 percentile)\n"))
 cat(paste("\t      Vmax =", get.95.str(vmax), "\n"))
 cat(paste("\t        Km =",   get.95.str(km), "\n"))
+cat(paste("\t   Vmax/Km =",   get.95.str(vmaxOverKm), "\n"))
 cat(paste("\t         ε =",get.95.str(errorSD), "\n"))
-if (kmSD != "-"){
+if (length(kmSD) > 1){
 	cat(paste("\t      kmSD =", get.95.str(kmSD), "\n"))
 }
-if (hill != "-"){
-	cat(paste("\t      Hill =", get.95.str(hill), "\n"))
+if (length(hill) > 1){	cat(paste("\t      Hill =", get.95.str(hill), "\n"))
 }
 cat(paste("\t p(hetero) =", phetero, "\n"))
 cat(paste("\t   p(Hill) =", phill, "\n"))
