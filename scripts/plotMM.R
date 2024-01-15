@@ -1,11 +1,5 @@
 if (!require(HDInterval, quietly = T)) install.packages("HDInterval")
 library(HDInterval)
-if (!require(graphics, quietly = T)) install.packages("graphics")
-library(graphics)
-if (!require(shape, quietly = T)) install.packages("shape")
-library(shape)
-if (!require(emdbook, quietly = T)) install.packages("emdbook")
-library(emdbook)
 
 
 HILL = FALSE
@@ -140,8 +134,6 @@ if (LOGX){
 }else{
 	plot(0,0, type="n", xlim = c(xmin, xmax), ylim = c(0, ymax), xlab = "a", ylab = "r", main = args[1], axes=F, xaxs="i", yaxs="i")
 }
-
-
 
 
 
